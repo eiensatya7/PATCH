@@ -1,5 +1,5 @@
-from tasks.huey_tasks import huey_instance
-import tasks.huey_tasks
+from tasks import huey_instance
+from tasks import add
 # from huey.consumer import Consumer
 
 
@@ -72,5 +72,5 @@ if __name__ == '__main__':
         try:
             multiprocessing.set_start_method('fork')
         except RuntimeError:
-            pass
+            passx
     consumer_main()
