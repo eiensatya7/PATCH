@@ -1,0 +1,25 @@
+create table public.error_events
+(
+    event_id                    integer                                       not null
+        constraint error_events_pk
+            primary key,
+    lob_app_id                  integer                                       not null
+        constraint error_events_lob_applications_id_fk
+            references public.lob_applications,
+    event_state                 varchar(100) default 'NEW'::character varying not null,
+    correlation_id              varchar(100),
+    span_id                     varchar(100),
+    stacktrace                  text,
+    origin_method               text,
+    resolution                  text,
+    pull_request_url            text,
+    confidence                  varchar(10),
+    resolution_acceptance_state varchar(10),
+    occurrence_count            integer      default 1                        not null,
+    created_ts                  timestamp    default now()                    not null,
+    updated_ts                  timestamp    default now()                    not null
+);
+
+alter table public.error_events
+    owner to patch_user;
+
