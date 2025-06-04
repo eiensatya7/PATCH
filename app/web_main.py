@@ -39,7 +39,9 @@ class WebMain:
         self.api_app.get("/error-events")(self.get_error_events)
         self.api_app.delete("/error-events/{event_id}")(self.cancel_error_events)
         self.api_app.post("/error-events/{event_id}/approve")(self.approve_error_event)
-    
+        self.api_app.post("/error-events/{event_id}/feedback")(self.capture_error_event_feedback)
+
+
     async def root(self):
         """
         Root endpoint that returns a hello world message.
@@ -210,7 +212,22 @@ class WebMain:
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail=f"Failed to approve error event: {str(e)}"
             )
-    
+
+    async def capture_error_event_feedback(self, like: bool|None = None, dislike: bool|None = None, feedback: str|None = None):
+        """
+        Endpoint to capture feedback on error events.
+        """
+        if like is not None:
+            return {"message": f"Received like feedback: {like}"}
+        elif dislike is not None:
+            return {"message": f"Received dislike feedback: {dislike}"}
+        else:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Please provide either 'like' or 'dislike' feedback"
+            )
+
+
     def get_app(self):
         """
         Return the FastAPI application instance.
