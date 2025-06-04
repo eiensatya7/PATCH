@@ -3,8 +3,8 @@ from typing import Optional
 from datetime import datetime
 
 class OnboardRequest(BaseModel):
-    application_name: Optional[str] = None
-    lob: Optional[str] = None
+    application_name:  str | None = None
+    lob:  str | None = None
     auto_resolve: bool = True
     environment: str
     git_remote_url: str

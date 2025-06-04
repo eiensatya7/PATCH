@@ -1,15 +1,3 @@
-from tasks import huey_instance
-from tasks import add
-# from huey.consumer import Consumer
-
-
-# if __name__ == "__main__":
-#     consumer = Consumer(huey)
-#     consumer.run()
-
-
-
-
 import logging
 import os
 import sys
@@ -19,6 +7,8 @@ from huey.consumer import Consumer
 from huey.consumer_options import ConsumerConfig
 from huey.consumer_options import OptionParserHandler
 from huey.utils import load_class
+
+from app.tasks import huey_instance, add
 
 
 def err(s):
@@ -72,5 +62,5 @@ if __name__ == '__main__':
         try:
             multiprocessing.set_start_method('fork')
         except RuntimeError:
-            passx
+            pass
     consumer_main()

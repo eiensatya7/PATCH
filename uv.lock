@@ -1199,6 +1199,7 @@ dependencies = [
     { name = "huey" },
     { name = "psycopg2-binary" },
     { name = "pydantic-ai", extra = ["examples", "logfire"] },
+    { name = "python-dotenv" },
     { name = "requests" },
     { name = "uvicorn" },
 ]
@@ -1210,6 +1211,7 @@ requires-dist = [
     { name = "huey", specifier = ">=2.5.3" },
     { name = "psycopg2-binary", specifier = ">=2.9.10" },
     { name = "pydantic-ai", extras = ["examples", "logfire"], specifier = ">=0.2.9" },
+    { name = "python-dotenv", specifier = ">=1.0.0" },
     { name = "requests", specifier = ">=2.32.3" },
     { name = "uvicorn", specifier = ">=0.34.2" },
 ]
