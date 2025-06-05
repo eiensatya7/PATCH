@@ -7,8 +7,7 @@ from app.model.lob_application import LobApplication
 from app.service.lob_applications_service import LobApplicationsService
 from app.model.error_event import ErrorEvent
 from app.service.error_event_service import ErrorEventService
-from app.model.onboard_request import OnboardRequest
-from app.tasks import add
+from app.tasks import submit_error_event
 import uvicorn
 
 
@@ -31,7 +30,6 @@ class WebMain:
         """
         Setup all API routes for the FastAPI application.
         """
-        self.api_app.get("/")(self.root)
         self.api_app.post("/lob-applications")(self.onboard_lob_applications)
         self.api_app.get("/lob-applications")(self.get_lob_applications_by_lob)
         self.api_app.get("/lob-applications/{lob_application_id}")(self.get_lob_application_by_id)
@@ -42,13 +40,7 @@ class WebMain:
         self.api_app.post("/error-events/{event_id}/feedback")(self.capture_error_event_feedback)
 
 
-    async def root(self):
-        """
-        Root endpoint that returns a hello world message.
-        """
-        task = add(1, 2)
-        return {"message": "Hello World " + str(task.id)}
-    
+
     def onboard_lob_applications(self, lob_application: LobApplication):
         """
         Endpoint to Onboard new lob application.
@@ -138,7 +130,7 @@ class WebMain:
             
             # If auto_resolve is TRUE, submit to the processing queue
             if lob_application.auto_resolve:
-                # TODO: Submit to processing queue
+                submit_error_event(created_error_event)
                 self.log.info(f"Error event {created_error_event.event_id} submitted to processing queue")
             
             self.log.info(f"Error event successfully processed with ID: {created_error_event.event_id}")
@@ -197,6 +189,9 @@ class WebMain:
             success = self.error_event_service.approve_error_event(event_id)
             
             if success:
+                error_event = self.error_event_service.get_error_event_by_id(event_id)
+                submit_error_event(error_event)
+                logging.info(f"Error event approved and submitted: {error_event.event_id}")
                 return {"message": f"Approved error event with event_id {event_id}."}
             else:
                 raise HTTPException(

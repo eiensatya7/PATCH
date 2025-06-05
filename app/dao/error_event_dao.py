@@ -145,9 +145,10 @@ class ErrorEventDao:
                         pull_request_url,
                         confidence,
                         resolution_acceptance_state,
-                        occurrence_count
+                        occurrence_count,
+                        error_timestamp
                     )
-                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                     RETURNING event_id, created_ts, updated_ts;
                 """
                 
@@ -157,13 +158,14 @@ class ErrorEventDao:
                     error_event.event_state,
                     error_event.correlation_id,
                     error_event.span_id,
-                    error_event.stack_trace,  # Use stack_trace for stacktrace field
+                    error_event.stacktrace,  # Use stack_trace for stacktrace field
                     error_event.origin_method,
                     error_event.resolution,
                     error_event.pull_request_url,
                     error_event.confidence,
                     error_event.resolution_acceptance_state,
-                    error_event.occurrence_count
+                    error_event.occurrence_count,
+                    error_event.error_timestamp
                 ))
                 
                 # Get the returned values (ID and timestamps)
@@ -173,7 +175,6 @@ class ErrorEventDao:
                     error_event.created_ts = result[1].isoformat()
                     error_event.updated_ts = result[2].isoformat()
                     # Set stacktrace field to the same value as stack_trace for consistency
-                    error_event.stacktrace = error_event.stack_trace
                     log.info(f"Error event saved successfully with ID: {error_event.event_id}")
                 
             return error_event

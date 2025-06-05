@@ -8,7 +8,7 @@ from huey.consumer_options import ConsumerConfig
 from huey.consumer_options import OptionParserHandler
 from huey.utils import load_class
 
-from app.tasks import huey_instance, add
+from app.tasks import huey_instance, submit_error_event
 
 
 def err(s):
