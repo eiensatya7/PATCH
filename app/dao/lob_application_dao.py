@@ -142,9 +142,12 @@ class LobApplicationDao:
                         git_remote_url, 
                         lookup_branch_pattern, 
                         filter_pii, 
-                        notification_dls
+                        notification_dls,
+                        app_info_actuator_url,
+                        jira_projects_url,
+                        app_dynamics_url
                     )
-                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                     RETURNING lob_app_id, created_ts, updated_ts;
                 """
                 
@@ -157,7 +160,10 @@ class LobApplicationDao:
                     lob_application.git_remote_url,
                     lob_application.lookup_branch_pattern,
                     lob_application.filter_pii,
-                    lob_application.notification_dls
+                    lob_application.notification_dls,
+                    lob_application.app_info_actuator_url,
+                    lob_application.jira_projects_url,
+                    lob_application.app_dynamics_url
                 ))
                 
                 # Get the returned values (ID and timestamps)
@@ -189,7 +195,8 @@ class LobApplicationDao:
                 select_query = """
                     SELECT lob_app_id, application_name, lob, auto_resolve, environment,
                            git_remote_url, lookup_branch_pattern, filter_pii,
-                           created_ts, updated_ts, notification_dls
+                           created_ts, updated_ts, notification_dls, app_info_actuator_url,
+                           jira_projects_url, app_dynamics_url
                     FROM lob_applications
                     WHERE lob_app_id = %s;
                 """
@@ -209,7 +216,10 @@ class LobApplicationDao:
                         filter_pii=result[7],
                         created_ts=result[8].isoformat(),
                         updated_ts=result[9].isoformat(),
-                        notification_dls=result[10]
+                        notification_dls=result[10],
+                        app_info_actuator_url=result[11],
+                        jira_projects_url=result[12],
+                        app_dynamics_url=result[13]
                     )
                 
                 return None
@@ -235,7 +245,8 @@ class LobApplicationDao:
                 select_query = """
                     SELECT lob_app_id, application_name, lob, auto_resolve, environment,
                            git_remote_url, lookup_branch_pattern, filter_pii,
-                           created_ts, updated_ts, notification_dls
+                           created_ts, updated_ts, notification_dls, app_info_actuator_url,
+                           jira_projects_url, app_dynamics_url
                     FROM lob_applications
                     WHERE lob = %s
                     ORDER BY application_name, environment;
@@ -257,7 +268,10 @@ class LobApplicationDao:
                         filter_pii=result[7],
                         created_ts=result[8].isoformat(),
                         updated_ts=result[9].isoformat(),
-                        notification_dls=result[10]
+                        notification_dls=result[10],
+                        app_info_actuator_url=result[11],
+                        jira_projects_url=result[12],
+                        app_dynamics_url=result[13]
                     )
                     lob_applications.append(lob_application)
                 
@@ -287,7 +301,8 @@ class LobApplicationDao:
                 select_query = """
                     SELECT lob_app_id, application_name, lob, auto_resolve, environment,
                            git_remote_url, lookup_branch_pattern, filter_pii,
-                           created_ts, updated_ts, notification_dls
+                           created_ts, updated_ts, notification_dls, app_info_actuator_url,
+                           jira_projects_url, app_dynamics_url
                     FROM lob_applications
                     WHERE lob = %s AND application_name = %s AND environment = %s;
                 """
@@ -307,7 +322,10 @@ class LobApplicationDao:
                         filter_pii=result[7],
                         created_ts=result[8].isoformat(),
                         updated_ts=result[9].isoformat(),
-                        notification_dls=result[10]
+                        notification_dls=result[10],
+                        app_info_actuator_url=result[11],
+                        jira_projects_url=result[12],
+                        app_dynamics_url=result[13]
                     )
                     log.info(f"Found lob application: {lob_application}")
                     return lob_application

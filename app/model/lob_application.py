@@ -20,6 +20,6 @@ class LobApplication(BaseModel):
     created_ts: str | None = None  # ISO 8601 format string
     updated_ts: str | None = None # ISO 8601 format string
     notification_dls: str
-    app_info_actuator_urlL: str | None = None  # URL for application info actuator
+    app_info_actuator_url: str | None = None  # URL for application info actuator
     jira_projects_url: str | None = None  # URL for Jira projects
     app_dynamics_url: str | None = None  # URL for AppDynamics
