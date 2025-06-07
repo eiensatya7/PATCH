@@ -133,3 +133,64 @@ class ErrorEventService:
         except Exception as e:
             self.log.error(f"Failed to update error event {event_id} with resolution: {e}")
             raise
+
+    def update_stacktrace_vector(self, event_id: int, stacktrace_vec: list) -> None:
+        """
+        Update the stacktrace vector for an error event.
+
+        Args:
+            event_id (int): The ID of the error event to update
+            stacktrace_vec (list): The stacktrace vector to set
+
+        Raises:
+            Exception: If the update operation fails
+        """
+        self.log.info(f"Updating error event {event_id} with stacktrace vector")
+        
+        try:
+            self.error_event_dao.update_stacktrace_vector(event_id, stacktrace_vec)
+            self.log.info(f"Error event {event_id} updated successfully with stacktrace vector")
+        except Exception as e:
+            self.log.error(f"Failed to update error event {event_id} with stacktrace vector: {e}")
+            raise
+
+    def update_affected_jira(self, event_id: int, affected_jira_ids: str) -> None:
+        """
+        Update the affected JIRA IDs for an error event.
+
+        Args:
+            event_id (int): The ID of the error event to update
+            affected_jira_ids (str): Comma-separated list of JIRA IDs
+
+        Raises:
+            Exception: If the update operation fails
+        """
+        self.log.info(f"Updating error event {event_id} with affected JIRA IDs: {affected_jira_ids}")
+        
+        try:
+            self.error_event_dao.update_affected_jira(event_id, affected_jira_ids)
+            self.log.info(f"Error event {event_id} updated successfully with affected JIRA IDs")
+        except Exception as e:
+            self.log.error(f"Failed to update error event {event_id} with affected JIRA IDs: {e}")
+            raise
+
+    def update_user_feedback(self, event_id: int, user_resolution_acceptance: str, user_feedback: str) -> None:
+        """
+        Update the user feedback for an error event.
+
+        Args:
+            event_id (int): The ID of the error event to update
+            user_resolution_acceptance (str): User acceptance of resolution (LIKE/DISLIKE)
+            user_feedback (str): User feedback text
+
+        Raises:
+            Exception: If the update operation fails
+        """
+        self.log.info(f"Updating error event {event_id} with user feedback")
+        
+        try:
+            self.error_event_dao.update_user_feedback(event_id, user_resolution_acceptance, user_feedback)
+            self.log.info(f"Error event {event_id} updated successfully with user feedback")
+        except Exception as e:
+            self.log.error(f"Failed to update error event {event_id} with user feedback: {e}")
+            raise

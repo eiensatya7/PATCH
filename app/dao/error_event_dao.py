@@ -383,6 +383,114 @@ class ErrorEventDao:
             log.error(f"Failed to update error event {event_id} with resolution: {e}")
             raise
 
+    def update_stacktrace_vector(self, event_id: int, stacktrace_vec: list) -> None:
+        """
+        Update the stacktrace vector for an error event.
+        
+        Args:
+            event_id (int): The ID of the error event to update
+            stacktrace_vec (list): The stacktrace vector to set
+            
+        Raises:
+            ValueError: If no error event found with the given ID
+            psycopg2.Error: If database operation fails
+        """
+        log.info(f"Updating error event {event_id} with stacktrace vector")
+        
+        try:
+            with self._get_db_cursor() as cursor:
+                update_query = """
+                    UPDATE error_events 
+                    SET stacktrace_vec = %s, updated_ts = now()
+                    WHERE event_id = %s;
+                """
+                
+                cursor.execute(update_query, (stacktrace_vec, event_id))
+                rows_affected = cursor.rowcount
+                
+                if rows_affected > 0:
+                    log.info(f"Successfully updated error event {event_id} with stacktrace vector")
+                else:
+                    log.error(f"No error event found with ID {event_id}")
+                    raise ValueError(f"No error event found with ID {event_id}")
+                
+        except psycopg2.Error as e:
+            log.error(f"Failed to update error event {event_id} with stacktrace vector: {e}")
+            raise
+
+    def update_affected_jira(self, event_id: int, affected_jira_ids: str) -> None:
+        """
+        Update the affected JIRA IDs for an error event.
+        
+        Args:
+            event_id (int): The ID of the error event to update
+            affected_jira_ids (str): Comma-separated list of JIRA IDs
+            
+        Raises:
+            ValueError: If no error event found with the given ID
+            psycopg2.Error: If database operation fails
+        """
+        log.info(f"Updating error event {event_id} with affected JIRA IDs: {affected_jira_ids}")
+        
+        try:
+            with self._get_db_cursor() as cursor:
+                update_query = """
+                    UPDATE error_events 
+                    SET affected_jira_ids = %s, updated_ts = now()
+                    WHERE event_id = %s;
+                """
+                
+                cursor.execute(update_query, (affected_jira_ids, event_id))
+                rows_affected = cursor.rowcount
+                
+                if rows_affected > 0:
+                    log.info(f"Successfully updated error event {event_id} with affected JIRA IDs")
+                else:
+                    log.error(f"No error event found with ID {event_id}")
+                    raise ValueError(f"No error event found with ID {event_id}")
+                
+        except psycopg2.Error as e:
+            log.error(f"Failed to update error event {event_id} with affected JIRA IDs: {e}")
+            raise
+
+    def update_user_feedback(self, event_id: int, user_resolution_acceptance: str, user_feedback: str) -> None:
+        """
+        Update the user feedback for an error event.
+        
+        Args:
+            event_id (int): The ID of the error event to update
+            user_resolution_acceptance (str): User acceptance of resolution (LIKE/DISLIKE)
+            user_feedback (str): User feedback text
+            
+        Raises:
+            ValueError: If no error event found with the given ID
+            psycopg2.Error: If database operation fails
+        """
+        log.info(f"Updating error event {event_id} with user feedback")
+        
+        try:
+            with self._get_db_cursor() as cursor:
+                update_query = """
+                    UPDATE error_events 
+                    SET user_resolution_acceptance = %s, 
+                        user_feedback = %s, 
+                        updated_ts = now()
+                    WHERE event_id = %s;
+                """
+                
+                cursor.execute(update_query, (user_resolution_acceptance, user_feedback, event_id))
+                rows_affected = cursor.rowcount
+                
+                if rows_affected > 0:
+                    log.info(f"Successfully updated error event {event_id} with user feedback")
+                else:
+                    log.error(f"No error event found with ID {event_id}")
+                    raise ValueError(f"No error event found with ID {event_id}")
+                
+        except psycopg2.Error as e:
+            log.error(f"Failed to update error event {event_id} with user feedback: {e}")
+            raise
+
     def close_connection_pool(self):
         """
         Close all connections in the pool.
