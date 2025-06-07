@@ -304,7 +304,7 @@ class ErrorEventDao:
             log.error(f"Failed to retrieve error events for lob {lob}: {e}")
             raise
 
-    def update_event_state(self, event_id: int, new_state: str) -> bool:
+    def update_event_state(self, event_id: int, new_state: str) -> None:
         """
         Update the state of an error event.
         
@@ -312,8 +312,9 @@ class ErrorEventDao:
             event_id (int): The ID of the error event to update
             new_state (str): The new state to set
             
-        Returns:
-            bool: True if the update was successful, False otherwise
+        Raises:
+            ValueError: If no error event found with the given ID
+            psycopg2.Error: If database operation fails
         """
         log.info(f"Updating error event {event_id} state to: {new_state}")
         
@@ -330,17 +331,16 @@ class ErrorEventDao:
                 
                 if rows_affected > 0:
                     log.info(f"Successfully updated error event {event_id} state to {new_state}")
-                    return True
                 else:
-                    log.warning(f"No error event found with ID {event_id}")
-                    return False
+                    log.error(f"No error event found with ID {event_id}")
+                    raise ValueError(f"No error event found with ID {event_id}")
                 
         except psycopg2.Error as e:
             log.error(f"Failed to update error event {event_id} state: {e}")
             raise
 
     def update_error_resolution(self, event_id: int, resolution: str, confidence: float, 
-                               pull_request_url: str, event_state: str) -> bool:
+                               pull_request_url: str, event_state: str) -> None:
         """
         Update error event with resolution details.
         
@@ -351,8 +351,9 @@ class ErrorEventDao:
             pull_request_url (str): URL of the pull request containing the fix
             event_state (str): The new state of the error event
             
-        Returns:
-            bool: True if the update was successful, False otherwise
+        Raises:
+            ValueError: If no error event found with the given ID
+            psycopg2.Error: If database operation fails
         """
         log.info(f"Updating error event {event_id} with resolution")
         
@@ -374,10 +375,9 @@ class ErrorEventDao:
                 
                 if rows_affected > 0:
                     log.info(f"Successfully updated error event {event_id} with resolution")
-                    return True
                 else:
-                    log.warning(f"No error event found with ID {event_id}")
-                    return False
+                    log.error(f"No error event found with ID {event_id}")
+                    raise ValueError(f"No error event found with ID {event_id}")
                 
         except psycopg2.Error as e:
             log.error(f"Failed to update error event {event_id} with resolution: {e}")

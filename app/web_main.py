@@ -186,22 +186,22 @@ class WebMain:
         try:
             # Check if event_id exists in the database & is in "PENDING_APPROVAL" state
             # If it exists, update its state to "PROCESSING" and submit to the processing queue
-            success = self.error_event_service.approve_error_event(event_id)
+            self.error_event_service.approve_error_event(event_id)
             
-            if success:
-                error_event = self.error_event_service.get_error_event_by_id(event_id)
-                submit_error_event(error_event)
-                logging.info(f"Error event approved and submitted: {error_event.event_id}")
-                return {"message": f"Approved error event with event_id {event_id}."}
-            else:
-                raise HTTPException(
-                    status_code=status.HTTP_404_NOT_FOUND,
-                    detail=f"Error event with id {event_id} not found or not in PENDING_APPROVAL state"
-                )
+            error_event = self.error_event_service.get_error_event_by_id(event_id)
+            submit_error_event(error_event)
+            logging.info(f"Error event approved and submitted: {error_event.event_id}")
+            return {"message": f"Approved error event with event_id {event_id}."}
                 
-        except HTTPException:
-            raise
+        except ValueError as e:
+            # Handle business logic errors (not found, wrong state)
+            self.log.warning(f"Business logic error approving error event {event_id}: {str(e)}")
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=str(e)
+            )
         except Exception as e:
+            # Handle all other errors as 500
             self.log.error(f"Error approving error event {event_id}: {str(e)}")
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,

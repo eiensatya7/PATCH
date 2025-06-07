@@ -75,39 +75,41 @@ class ErrorEventService:
         self.log.info(f"Error event created successfully with id {saved_error_event.event_id}")
         return saved_error_event
 
-    def approve_error_event(self, event_id: int) -> bool:
+    def approve_error_event(self, event_id: int) -> None:
         """
         Approve an error event by changing its state from PENDING_APPROVAL to PROCESSING.
 
         Args:
             event_id (int): The ID of the error event to approve.
 
-        Returns:
-            bool: True if the approval was successful, False otherwise.
+        Raises:
+            ValueError: If the error event is not found or not in PENDING_APPROVAL state
+            Exception: If database operation fails
         """
         self.log.info(f"Approving error event with id {event_id}")
         
         # First check if the event exists and is in PENDING_APPROVAL state
         error_event = self.error_event_dao.find_by_id(event_id)
         if not error_event:
-            self.log.warning(f"Error event with id {event_id} not found")
-            return False
+            self.log.error(f"Error event with id {event_id} not found")
+            raise ValueError(f"Error event with id {event_id} not found")
         
         if error_event.event_state != "PENDING_APPROVAL":
-            self.log.warning(f"Error event with id {event_id} is not in PENDING_APPROVAL state. Current state: {error_event.event_state}")
-            return False
+            self.log.error(f"Error event with id {event_id} is not in PENDING_APPROVAL state. Current state: {error_event.event_state}")
+            raise ValueError(f"Error event with id {event_id} is not in PENDING_APPROVAL state. Current state: {error_event.event_state}")
         
         # Update the state to PROCESSING
-        success = self.error_event_dao.update_event_state(event_id, "PROCESSING")
-        if success:
+        try:
+            self.error_event_dao.update_event_state(event_id, "PROCESSING")
             self.log.info(f"Error event {event_id} approved and moved to PROCESSING state")
             # TODO: Submit to processing queue
             self.log.info(f"Error event {event_id} submitted to processing queue")
-        else:
-            self.log.error(f"Failed to approve error event {event_id}")
+        except Exception as e:
+            self.log.error(f"Failed to approve error event {event_id}: {e}")
+            raise
         
     def update_error_resolution(self, event_id: int, resolution: str, confidence: float, 
-                               pull_request_url: str, event_state: str) -> bool:
+                               pull_request_url: str, event_state: str) -> None:
         """
         Update an error event with resolution details.
 
@@ -118,18 +120,16 @@ class ErrorEventService:
             pull_request_url (str): URL of the pull request containing the fix
             event_state (str): The new state of the error event
 
-        Returns:
-            bool: True if the update was successful, False otherwise
+        Raises:
+            Exception: If the update operation fails
         """
         self.log.info(f"Updating error event {event_id} with resolution")
         
-        success = self.error_event_dao.update_error_resolution(
-            event_id, resolution, confidence, pull_request_url, event_state
-        )
-        
-        if success:
+        try:
+            self.error_event_dao.update_error_resolution(
+                event_id, resolution, confidence, pull_request_url, event_state
+            )
             self.log.info(f"Error event {event_id} updated successfully with resolution")
-        else:
-            self.log.error(f"Failed to update error event {event_id} with resolution")
-        
-        return success
+        except Exception as e:
+            self.log.error(f"Failed to update error event {event_id} with resolution: {e}")
+            raise
