@@ -106,4 +106,30 @@ class ErrorEventService:
         else:
             self.log.error(f"Failed to approve error event {event_id}")
         
+    def update_error_resolution(self, event_id: int, resolution: str, confidence: float, 
+                               pull_request_url: str, event_state: str) -> bool:
+        """
+        Update an error event with resolution details.
+
+        Args:
+            event_id (int): The ID of the error event to update
+            resolution (str): The resolution description
+            confidence (float): The confidence level of the resolution
+            pull_request_url (str): URL of the pull request containing the fix
+            event_state (str): The new state of the error event
+
+        Returns:
+            bool: True if the update was successful, False otherwise
+        """
+        self.log.info(f"Updating error event {event_id} with resolution")
+        
+        success = self.error_event_dao.update_error_resolution(
+            event_id, resolution, confidence, pull_request_url, event_state
+        )
+        
+        if success:
+            self.log.info(f"Error event {event_id} updated successfully with resolution")
+        else:
+            self.log.error(f"Failed to update error event {event_id} with resolution")
+        
         return success

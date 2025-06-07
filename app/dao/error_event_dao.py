@@ -339,6 +339,50 @@ class ErrorEventDao:
             log.error(f"Failed to update error event {event_id} state: {e}")
             raise
 
+    def update_error_resolution(self, event_id: int, resolution: str, confidence: float, 
+                               pull_request_url: str, event_state: str) -> bool:
+        """
+        Update error event with resolution details.
+        
+        Args:
+            event_id (int): The ID of the error event to update
+            resolution (str): The resolution description
+            confidence (float): The confidence level of the resolution
+            pull_request_url (str): URL of the pull request containing the fix
+            event_state (str): The new state of the error event
+            
+        Returns:
+            bool: True if the update was successful, False otherwise
+        """
+        log.info(f"Updating error event {event_id} with resolution")
+        
+        try:
+            with self._get_db_cursor() as cursor:
+                update_query = """
+                    UPDATE error_events 
+                    SET resolution = %s, 
+                        confidence = %s, 
+                        pull_request_url = %s, 
+                        event_state = %s, 
+                        updated_ts = now()
+                    WHERE event_id = %s;
+                """
+                
+                cursor.execute(update_query, (resolution, confidence, pull_request_url, 
+                                            event_state, event_id))
+                rows_affected = cursor.rowcount
+                
+                if rows_affected > 0:
+                    log.info(f"Successfully updated error event {event_id} with resolution")
+                    return True
+                else:
+                    log.warning(f"No error event found with ID {event_id}")
+                    return False
+                
+        except psycopg2.Error as e:
+            log.error(f"Failed to update error event {event_id} with resolution: {e}")
+            raise
+
     def close_connection_pool(self):
         """
         Close all connections in the pool.
