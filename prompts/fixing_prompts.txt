@@ -1,0 +1,39 @@
+----------------------
+
+
+Look at error_events_ddl.sql and fix error_events_da.py to refer to correct column names. 
+
+No need to save other error event columns in save_error_event method for now.
+
+----------------------
+
+
+
+Create a method with name 'update_error_resolution in error_event_dao.py to update error_events table with resolution, confidence, pull_request_url, event_state and updated_ts. 
+
+Create a method with same name in error_event_server and and call the dao method.
+
+Note: I don't need finally summary of what changes you are doing. I will look at changes from IDE to validate
+
+
+----------------------
+
+
+
+
+
+1. Create a method with name 'update_stacktrace_vector in error_event_dao.py to update error_events table with stacktrace_vec and updated_ts. 
+2. Create a method with name 'update_affected_jira in error_event_dao.py to update error_events table with affected_jira_ids and updated_ts. 
+3. Create a method with name 'update_user_feedback in error_event_dao.py to update error_events table with user_resolution_acceptance,user_feedback and updated_ts. 
+
+4. Create a method with same names in error_event_server and and call the corresponding dao methods.
+
+Note: I don't need finally summary of what changes you are doing. I will look at changes from IDE to validate
+
+
+
+----------------------
+
+
+
+
