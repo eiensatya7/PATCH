@@ -71,7 +71,7 @@ class ErrorEventService:
         error_event.lob_app_id = lob_app_id
         error_event.event_state = event_state
         
-        saved_error_event = self.error_event_dao.save(error_event)
+        saved_error_event = self.error_event_dao.save_error_event(error_event)
         self.log.info(f"Error event created successfully with id {saved_error_event.event_id}")
         return saved_error_event
 

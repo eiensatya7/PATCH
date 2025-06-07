@@ -115,7 +115,7 @@ class ErrorEventDao:
                 if cursor:
                     cursor.close()
     
-    def save(self, error_event: ErrorEvent) -> ErrorEvent:
+    def save_error_event(self, error_event: ErrorEvent) -> ErrorEvent:
         """
         Save a new error event to the database.
         
@@ -141,14 +141,12 @@ class ErrorEventDao:
                         span_id,
                         stacktrace,
                         origin_method,
-                        resolution,
-                        pull_request_url,
-                        confidence,
-                        resolution_acceptance_state,
                         occurrence_count,
-                        error_timestamp
+                        error_timestamp,
+                        origin_line_number,
+                        origin_class
                     )
-                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                     RETURNING event_id, created_ts, updated_ts;
                 """
                 
@@ -158,14 +156,12 @@ class ErrorEventDao:
                     error_event.event_state,
                     error_event.correlation_id,
                     error_event.span_id,
-                    error_event.stacktrace,  # Use stack_trace for stacktrace field
+                    error_event.stacktrace,
                     error_event.origin_method,
-                    error_event.resolution,
-                    error_event.pull_request_url,
-                    error_event.confidence,
-                    error_event.resolution_acceptance_state,
                     error_event.occurrence_count,
-                    error_event.error_timestamp
+                    error_event.error_timestamp,
+                    error_event.origin_line_number,
+                    error_event.origin_class
                 ))
                 
                 # Get the returned values (ID and timestamps)
@@ -174,7 +170,6 @@ class ErrorEventDao:
                     error_event.event_id = result[0]
                     error_event.created_ts = result[1].isoformat()
                     error_event.updated_ts = result[2].isoformat()
-                    # Set stacktrace field to the same value as stack_trace for consistency
                     log.info(f"Error event saved successfully with ID: {error_event.event_id}")
                 
             return error_event
@@ -198,8 +193,9 @@ class ErrorEventDao:
                 select_query = """
                     SELECT event_id, lob_app_id, event_state, correlation_id, span_id,
                            stacktrace, origin_method, resolution, pull_request_url,
-                           confidence, resolution_acceptance_state, occurrence_count,
-                           created_ts, updated_ts
+                           confidence, user_resolution_acceptance, occurrence_count,
+                           created_ts, updated_ts, error_timestamp, user_feedback,
+                           origin_line_number, origin_class, source_branch, affected_jira_ids
                     FROM error_events
                     WHERE event_id = %s;
                 """
@@ -214,21 +210,25 @@ class ErrorEventDao:
                         event_state=result[2],
                         correlation_id=result[3],
                         span_id=result[4],
-                        stack_trace=result[5],  # Use stacktrace from DB for stack_trace field
                         stacktrace=result[5],
                         origin_method=result[6],
                         resolution=result[7],
                         pull_request_url=result[8],
                         confidence=result[9],
-                        resolution_acceptance_state=result[10],
+                        user_resolution_acceptance=result[10],
                         occurrence_count=result[11],
                         created_ts=result[12].isoformat(),
                         updated_ts=result[13].isoformat(),
+                        error_timestamp=result[14].isoformat(),
+                        user_feedback=result[15],
+                        origin_line_number=result[16],
+                        origin_class=result[17],
+                        source_branch=result[18],
+                        affected_jira_ids=result[19],
                         # Set required fields with empty values since they're not stored in DB
                         lob="",
                         application_name="",
-                        environment="",
-                        timestamp=""
+                        environment=""
                     )
                 
                 return None
@@ -254,8 +254,10 @@ class ErrorEventDao:
                 select_query = """
                     SELECT ee.event_id, ee.lob_app_id, ee.event_state, ee.correlation_id, 
                            ee.span_id, ee.stacktrace, ee.origin_method, ee.resolution,
-                           ee.pull_request_url, ee.confidence, ee.resolution_acceptance_state,
-                           ee.occurrence_count, ee.created_ts, ee.updated_ts,
+                           ee.pull_request_url, ee.confidence, ee.user_resolution_acceptance,
+                           ee.occurrence_count, ee.created_ts, ee.updated_ts, ee.error_timestamp,
+                           ee.user_feedback, ee.origin_line_number, ee.origin_class,
+                           ee.source_branch, ee.affected_jira_ids,
                            la.lob, la.application_name, la.environment
                     FROM error_events ee
                     JOIN lob_applications la ON ee.lob_app_id = la.lob_app_id
@@ -274,20 +276,24 @@ class ErrorEventDao:
                         event_state=result[2],
                         correlation_id=result[3],
                         span_id=result[4],
-                        stack_trace=result[5],
                         stacktrace=result[5],
                         origin_method=result[6],
                         resolution=result[7],
                         pull_request_url=result[8],
                         confidence=result[9],
-                        resolution_acceptance_state=result[10],
+                        user_resolution_acceptance=result[10],
                         occurrence_count=result[11],
                         created_ts=result[12].isoformat(),
                         updated_ts=result[13].isoformat(),
-                        lob=result[14],
-                        application_name=result[15],
-                        environment=result[16],
-                        timestamp=result[12].isoformat()  # Use created_ts as timestamp
+                        error_timestamp=result[14].isoformat(),
+                        user_feedback=result[15],
+                        origin_line_number=result[16],
+                        origin_class=result[17],
+                        source_branch=result[18],
+                        affected_jira_ids=result[19],
+                        lob=result[20],
+                        application_name=result[21],
+                        environment=result[22]
                     )
                     error_events.append(error_event)
                 

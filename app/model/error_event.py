@@ -25,18 +25,14 @@ class ErrorEvent(BaseModel):
     resolution: str | None = None
     pull_request_url: str | None = None
     confidence: str | None = None
-    resolution_acceptance_state: str | None = None
+    user_resolution_acceptance: str | None = None # e.g., "LIKE", "DISLIKE"
     occurrence_count: int = 1
     created_ts: datetime | None = None
     updated_ts: datetime | None = None
+    # stacktrace_vec TODO
     error_timestamp: datetime
-
-    def __str__(self) -> str:
-        return (
-            f"ErrorEvent(event_id={self.event_id}, "
-            f"correlation_id={self.correlation_id}, "
-            f"stack_trace={self.stacktrace}, lob={self.lob}, "
-            f"application_name={self.application_name}, "
-            f"environment={self.environment}, error_timestamp={self.error_timestamp}, "
-            f"event_state={self.event_state})"
-        )
+    user_feedback: str | None = None
+    origin_line_number: int
+    origin_class: str | None = None
+    source_branch: str | None = None
+    affected_jira_ids: str | None = None # Comma-separated list of Jira IDs

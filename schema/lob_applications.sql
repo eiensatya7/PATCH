@@ -7,12 +7,15 @@ create table public.lob_applications
     lob                   varchar(10),
     auto_resolve          boolean     default true                                not null,
     environment           varchar(4)                                              not null,
-    git_remote_url        varchar(255)                                            not null,
+    git_remote_url        varchar(500)                                            not null,
     lookup_branch_pattern varchar(50) default 'LATEST_RELEASE'::character varying not null,
     filter_pii            boolean     default false                               not null,
     created_ts            timestamp   default now()                               not null,
     updated_ts            timestamp   default now()                               not null,
-    notification_dls      text                                                    not null
+    notification_dls      text                                                    not null,
+    app_info_actuator_url varchar(500),
+    jira_projects_url     varchar(500),
+    app_dynamics_url      varchar(500)
 );
 
 alter table public.lob_applications
